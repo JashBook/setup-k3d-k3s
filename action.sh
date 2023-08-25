@@ -72,9 +72,9 @@ K3D=$(k3d --version | grep -Po 'k3d version \K(v[\S]+)' || true )
 echo "Detected k3d-version::${K3D}"
 echo "Detected k3s-version::${K3S}"
 echo "Detected k8s-version::${K8S}"
-echo "k3d-version=${K3D}" >> $GITHUB_OUTPUT
-echo "k3s-version=${K3S}" >> $GITHUB_OUTPUT
-echo "k8s-version=${K8S}" >> $GITHUB_OUTPUT
+# echo "k3d-version=${K3D}" >> $GITHUB_OUTPUT
+# echo "k3s-version=${K3S}" >> $GITHUB_OUTPUT
+# echo "k8s-version=${K8S}" >> $GITHUB_OUTPUT
 
 # Start a cluster. It takes 20 seconds usually.
 if [[ -z "${SKIP_CREATION}" ]]; then
@@ -87,6 +87,7 @@ fi
 # we need to wait until the cluster is fully ready before starting the tests.
 if [[ -z "${SKIP_CREATION}" && -z "${SKIP_READINESS}" ]]; then
   echo "::group::Waiting for cluster readiness"
+  kubectl create ns github-runner
   while ! kubectl get serviceaccount default >/dev/null; do sleep 1; done
   echo "::endgroup::"
 else
