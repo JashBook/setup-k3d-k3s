@@ -87,6 +87,15 @@ fi
 # we need to wait until the cluster is fully ready before starting the tests.
 if [[ -z "${SKIP_CREATION}" && -z "${SKIP_READINESS}" ]]; then
   echo "::group::Waiting for cluster readiness"
+  docker_cli=$( command -v docker )
+  if [[ ! -z "$docker_cli" ]]; then
+    docker ps -a
+    for containerId in $( docker ps -a | grep k3d | egrep "server|agent" | awk '{print $1}' ); do
+      echo "containerId:"$containerId
+      echo "mount --make-rshared /"
+      docker exec -t $containerId sh -c "mount --make-rshared /"
+    done
+  fi
   kubectl create ns github-runner
   while ! kubectl get serviceaccount default >/dev/null; do sleep 1; done
   echo "::endgroup::"
